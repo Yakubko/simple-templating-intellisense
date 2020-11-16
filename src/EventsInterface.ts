@@ -6,24 +6,17 @@ export default class EventInterface {
     private registerName: string;
 
     private state: { ignoreOneTimeKeyUpEvent: boolean } = { ignoreOneTimeKeyUpEvent: false };
+    private scrollableElements: (HTMLElement | Window)[] = [];
 
     constructor(element: AllowedElements, registerName: string) {
         this.element = element;
         this.registerName = registerName;
 
-        this.element.addEventListener('blur', this, false);
         this.element.addEventListener('focus', this, false);
-        this.element.addEventListener('click', this, false);
-        this.element.addEventListener('keyup', this, false);
-        this.element.addEventListener('keydown', this, false);
     }
 
     unbind(): void {
-        this.element.removeEventListener('blur', this, false);
         this.element.removeEventListener('focus', this, false);
-        this.element.removeEventListener('click', this, false);
-        this.element.removeEventListener('keyup', this, false);
-        this.element.removeEventListener('keydown', this, false);
     }
 
     getElement(): AllowedElements {
@@ -33,12 +26,17 @@ export default class EventInterface {
     handleEvent(event: Event): void {
         switch (event.type) {
             case 'focus':
-                List.attach(this.registerName, this.element);
+                this.focus();
+                break;
+
+            case 'mouseup':
+                this.resize();
                 break;
 
             case 'blur':
-                List.detach();
+                this.blur();
             case 'click':
+            case 'scroll':
                 List.hide();
                 break;
 
@@ -52,68 +50,105 @@ export default class EventInterface {
         }
     }
 
+    private focus(): void {
+        this.element.addEventListener('blur', this, false);
+        this.element.addEventListener('click', this, false);
+        this.element.addEventListener('keyup', this, false);
+        this.element.addEventListener('keydown', this, false);
+
+        if (this.element.nodeName === 'TEXTAREA') {
+            this.element.addEventListener('scroll', this, false);
+            this.element.addEventListener('mouseup', this, false);
+            this.element.dataset.stiWidth = this.element.clientWidth + '';
+            this.element.dataset.stiHeight = this.element.clientHeight + '';
+        }
+
+        this.scrollableElements = this.getScrollableParents(this.element.parentElement);
+        this.scrollableElements.forEach((el) => {
+            el.addEventListener('scroll', this, false);
+        });
+
+        List.attach(this.element, this.registerName);
+    }
+
+    private blur() {
+        this.element.removeEventListener('blur', this, false);
+        this.element.removeEventListener('click', this, false);
+        this.element.removeEventListener('keyup', this, false);
+        this.element.removeEventListener('keydown', this, false);
+
+        if (this.element.nodeName === 'TEXTAREA') {
+            this.element.removeEventListener('scroll', this, false);
+            this.element.removeEventListener('mouseup', this, false);
+            delete this.element.dataset.stiWidth;
+            delete this.element.dataset.stiHeight;
+        }
+
+        this.scrollableElements.forEach((el) => {
+            el.removeEventListener('scroll', this, false);
+        });
+
+        List.detach();
+    }
+
+    private resize(): void {
+        if (this.element.clientWidth !== parseInt(this.element.dataset.stiWidth) || this.element.clientHeight !== parseInt(this.element.dataset.stiHeight)) {
+            this.element.dataset.stiWidth = this.element.clientWidth + '';
+            this.element.dataset.stiHeight = this.element.clientHeight + '';
+            List.attach(this.element, this.registerName);
+        }
+    }
+
     private keyup(event: KeyboardEvent): void {
         if (this.state.ignoreOneTimeKeyUpEvent) {
             this.state.ignoreOneTimeKeyUpEvent = false;
             return;
         }
 
+        if (event.key === 'Escape') {
+            List.hide();
+            return;
+        }
+
         const { value, selectionStart: caretPosition } = this.element;
-        if (event.type === 'keyup' && event.key === '{' && value.substr(caretPosition - 2, 2) === '{{') {
+        if (event.key === '{' && value.substr(caretPosition - 2, 2) === '{{') {
             this.state.ignoreOneTimeKeyUpEvent = true;
-            this.addValueString('}}');
+            this.addValueString('}}', true);
         }
 
         const bracketActiveWord = this.getBracketActiveWord();
         if (bracketActiveWord !== null) {
-            List.filter(bracketActiveWord);
-
-            const { visible, partialFilter, data } = List.getState();
-            if (visible && (event.key === 'Backspace' || (event.key.length === 1 && event.key !== ' '))) {
-                if (event.key !== 'Backspace') {
-                    const addSuggestedString = data[0].substr(partialFilter.length);
-                    if (addSuggestedString) {
-                        this.addValueString(addSuggestedString, true);
-                    }
-                }
-
-                List.align();
-            }
+            List.show(bracketActiveWord);
         } else {
             List.hide();
         }
     }
 
     private keydown(event: KeyboardEvent): void {
-        const { visible } = List.getState();
-        if (visible && ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) {
+        if (List.isVisible() && ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) {
             this.state.ignoreOneTimeKeyUpEvent = true;
             if (['ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) event.preventDefault();
 
             if (['ArrowRight', 'ArrowLeft', 'Enter'].includes(event.key)) {
-                List.hide();
-
                 if (event.key === 'Enter') {
-                    if (this.element.selectionStart !== this.element.selectionEnd) this.element.selectionStart = this.element.selectionEnd;
+                    const selected = List.select();
+
+                    this.addValueString(selected.autocomplete);
                 }
+
+                List.hide();
             }
 
             if (['ArrowUp', 'ArrowDown'].includes(event.key)) {
-                List.selectByDirection(event.key === 'ArrowUp' ? 'up' : 'down');
-                const { partialFilter, data, selectedIndex } = List.getState();
-                const addSuggestedString = data[selectedIndex].substr(partialFilter.length);
-                this.addValueString(addSuggestedString, true);
+                List.select(event.key === 'ArrowUp' ? 'up' : 'down');
             }
         }
     }
 
-    private addValueString(addValue: string, select = false): void {
+    private addValueString(addValue: string, fixedSelection = false): void {
         const { value, selectionStart, selectionEnd } = this.element;
         this.element.value = [value.slice(0, selectionStart), addValue, value.slice(selectionEnd)].join('');
-        this.element.selectionStart = this.element.selectionEnd = selectionStart;
-        if (select) {
-            this.element.selectionEnd += addValue.length;
-        }
+        this.element.selectionStart = this.element.selectionEnd = fixedSelection ? selectionStart : selectionStart + addValue.length;
     }
 
     private getBracketActiveWord(): string | null {
@@ -131,5 +166,19 @@ export default class EventInterface {
             }
         }
         return valueInBrackets;
+    }
+
+    private getScrollableParents(element: HTMLElement, data: (HTMLElement | Window)[] = []): (HTMLElement | Window)[] {
+        if (element == null) return data;
+        if (element === document.body) {
+            data.push(window);
+            return data;
+        }
+
+        if (element.scrollHeight > element.clientHeight) {
+            data.push(element);
+        }
+
+        return this.getScrollableParents(element.parentElement, data);
     }
 }

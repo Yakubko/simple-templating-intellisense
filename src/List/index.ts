@@ -1,178 +1,95 @@
-import ListDOM from './ListDOM';
-import { AllowedElements } from '../types';
+import Component, { IntellisenseList } from './Component';
+import STIntellisense from '../';
+import { AllowedElements, IntellisenseData } from '../types';
 
-export type ListData = Record<string, any>;
-
-type ListActiveRegister = {
-    name: string;
-    element: AllowedElements | null;
-    scrollableElements: (AllowedElements | Window)[];
-};
-type ListState = {
-    visible: boolean;
-    data: string[];
-    partialFilter: string;
-    selectedIndex: number;
+const _mod = (n: number, m: number): number => {
+    return ((n % m) + m) % m;
 };
 
 class List {
-    private listDOM: ListDOM;
-    private registersData: Record<string, ListData> = {};
-    private activeRegister: ListActiveRegister = {
-        element: null,
-        name: '',
-        scrollableElements: [],
-    };
+    private forRegister: string | null;
 
-    private state: ListState = {
-        visible: false,
-        data: [],
-        partialFilter: '',
-        selectedIndex: 0,
-    };
+    private visibleData: IntellisenseList[] = [];
+    private selectedIndex = 0;
 
-    constructor() {
-        this.listDOM = new ListDOM();
-    }
+    attach(element: AllowedElements, registerName: string): void {
+        this.forRegister = registerName;
+        this.visibleData = [];
+        this.selectedIndex = 0;
 
-    data(name: string, data?: ListData): ListData {
-        if (data) this.registersData[name] = data;
-
-        return this.registersData[name];
-    }
-
-    getState(): ListState {
-        return this.state;
-    }
-
-    attach(registerName: string, element: AllowedElements): void {
-        if (this.activeRegister.element) {
-            if (element.isSameNode(this.activeRegister.element)) return;
-            else this.detach();
-        }
-
-        const { scrollable, zIndex } = this.getParentsConf(element);
-
-        this.activeRegister.name = registerName;
-        this.activeRegister.element = element;
-        this.activeRegister.scrollableElements = scrollable;
-
-        this.listDOM.getElement().style.zIndex = zIndex ? (zIndex + 1).toString() : 'auto';
-
-        this.activeRegister.scrollableElements.forEach((node) => {
-            node.addEventListener('scroll', this, false);
-        });
-
-        this.align();
+        Component.attach(element);
     }
 
     detach(): void {
-        this.activeRegister.scrollableElements.forEach((node) => {
-            node.removeEventListener('scroll', this, false);
-        });
+        this.forRegister = null;
+        this.visibleData = [];
+        this.selectedIndex = 0;
 
-        this.activeRegister.name = '';
-        this.activeRegister.element = null;
-        this.activeRegister.scrollableElements = [];
+        Component.detach();
     }
 
-    handleEvent(event: Event): void {
-        if (event.type === 'scroll') this.hide();
-    }
+    show(filter: string): void {
+        this.visibleData = this.getFilteredData(filter);
+        this.selectedIndex = 0;
 
-    align(): void {
-        if (this.state.visible) this.listDOM.alignTo(this.activeRegister.element);
-    }
-
-    show(): void {
-        if (this.state.visible) return;
-
-        this.state = { ...this.state, visible: true };
-        this.listDOM.show();
+        Component.renderList(this.visibleData);
     }
 
     hide(): void {
-        this.state = { ...this.state, visible: false };
-        this.listDOM.hide();
+        Component.renderList([]);
     }
 
-    bindData(data: string[]): void {
-        this.state = { ...this.state, selectedIndex: 0 };
-        this.listDOM.bindData(data);
-    }
-
-    filter(filter: string): void {
-        const { partialFilter, data } = this.getFilteredData(filter);
-        this.state = { ...this.state, partialFilter, data };
-
-        if (data.length > 0) {
-            this.show();
-            this.bindData(data);
-        } else this.hide();
-    }
-
-    selectByDirection(direction: 'up' | 'down'): void {
-        if (this.state.data.length > 1) {
-            this.state.selectedIndex = this.mod(this.state.selectedIndex + (direction === 'down' ? 1 : -1), this.state.data.length);
-            this.listDOM.select(this.state.selectedIndex);
+    select(direction?: 'up' | 'down'): IntellisenseList | null {
+        if (direction && this.visibleData.length > 1) {
+            this.selectedIndex = _mod(this.selectedIndex + (direction === 'down' ? 1 : -1), this.visibleData.length);
+            Component.select(this.selectedIndex, this.visibleData[this.selectedIndex]);
         }
+
+        return this.visibleData[this.selectedIndex] || null;
     }
 
-    private getFilteredData(path: string): { partialFilter: string; data: string[] } {
-        const data = this.registersData[this.activeRegister.name];
-        const fnGetScopeLevel = (_path: string[], _data: ListData) => {
+    isVisible(): boolean {
+        return Component.isVisible();
+    }
+
+    private getFilteredData(path: string): IntellisenseList[] {
+        const data = STIntellisense.getRegister(this.forRegister).data();
+
+        const fnGetScopeLevel = (_path: string[], _data: IntellisenseData): IntellisenseList[] => {
             if (_path.length > 1) {
                 const key = _path.shift();
-                if (_data[key]) {
-                    return fnGetScopeLevel(_path, _data[key]);
+                if (_data[key] && _data[key].nestedData) {
+                    return fnGetScopeLevel(_path, _data[key].nestedData);
                 }
-                return null;
+                return [];
             } else if (_path.length === 1) {
-                return _data;
+                const output: IntellisenseList[] = [];
+                for (const [key, value] of Object.entries(_data)) {
+                    output.push({ name: key, autocomplete: key.substr(_path[0].length), object: value });
+                }
+
+                return output;
             }
 
-            return null;
+            return [];
         };
 
         const pathList = path.split('.');
-        const filteredData = fnGetScopeLevel(pathList, data);
-        let retData = filteredData ? Object.keys(filteredData) : [];
-        retData.sort();
+        let filteredData = fnGetScopeLevel(pathList, data);
 
-        if (retData && pathList[0]) {
-            retData = retData.filter((item) => item.startsWith(pathList[0]));
-            if (retData.length === 1 && pathList[0] === retData[0]) {
-                retData = [];
+        if (filteredData && pathList[0]) {
+            filteredData = filteredData.filter((item) => item.name.startsWith(pathList[0]));
+
+            if (filteredData.length === 1 && filteredData[0].name === pathList[0]) {
+                filteredData = [];
             }
         }
 
-        return { partialFilter: pathList[0], data: retData };
-    }
+        filteredData.sort((a, b) => {
+            return (a.object.priority || Number.POSITIVE_INFINITY) - (b.object.priority || Number.POSITIVE_INFINITY) || a.name.localeCompare(b.name);
+        });
 
-    private getParentsConf(
-        node: AllowedElements,
-        data: { scrollable: (AllowedElements | Window)[]; zIndex: number } = {
-            scrollable: [],
-            zIndex: 0,
-        },
-    ): { scrollable: (AllowedElements | Window)[]; zIndex: number } {
-        if (node == null) return data;
-        if (node === document.body) {
-            data.scrollable.push(window);
-            return data;
-        }
-
-        if (node.scrollHeight > node.clientHeight || node.tagName === 'TEXTAREA') {
-            data.scrollable.push(node);
-        }
-
-        data.zIndex = Math.max(data.zIndex, parseInt(window.getComputedStyle(node).getPropertyValue('z-index')) || 0);
-
-        return this.getParentsConf(node.parentNode as AllowedElements, data);
-    }
-
-    private mod(n: number, m: number): number {
-        return ((n % m) + m) % m;
+        return filteredData;
     }
 }
 

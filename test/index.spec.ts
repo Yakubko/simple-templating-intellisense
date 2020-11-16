@@ -1,9 +1,9 @@
-import Autocomplete from '../src';
+import STIntellisense from '../src/index';
 
-describe('Autocomplete', () => {
+describe('STIntellisense', () => {
     it('list', () => {
-        const register = Autocomplete.getRegister();
-        const list = { user: {} };
+        const register = STIntellisense.getRegister();
+        const list = { user: { name: 'user', title: 'User' } };
         register.data(list);
 
         expect(register.data()).toBe(list);

@@ -1,17 +1,10 @@
-.a-body {
+#sti-body {
     position: fixed;
     display: none;
-}
-
-.ui-autocomplete {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
     border: solid 1px #ccc;
     background-color: #fff;
-    width: 300px;
+    width: 500px;
     height: 200px;
-    overflow-y: scroll;
     background-color: #ffffff;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -19,10 +12,19 @@
     border-radius: 4px;
     -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    font-family: Arial, Verdana, Sans-Serif;
 }
 
-.ui-autocomplete li {
-    font-family: Arial, Verdana, Sans-Serif;
+#sti-body .sti-list {
+    width: 50%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    overflow-y: scroll;
+}
+
+#sti-body .sti-list li {
     padding: 3px 10px;
     clear: both;
     font-weight: 400;
@@ -31,9 +33,29 @@
     white-space: nowrap;
 }
 
-.ui-autocomplete .ui-state-focus {
+#sti-body .sti-list .ui-state-focus {
     color: #ffffff;
     text-decoration: none;
     background-color: #428bca;
     outline: 0;
+}
+
+#sti-body .sti-detail {
+    width: 50%;
+    height: 100%;
+    padding: 5px;
+    border-left: 1px solid rgba(0, 0, 0, 0.15);
+    overflow-y: scroll;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#sti-body .sti-detail hr {
+    margin: 5px;
+    padding: 0;
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }

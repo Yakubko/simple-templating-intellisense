@@ -3,6 +3,34 @@
     <head>
         <meta charset="UTF-8" />
         <title>Autocomplete test</title>
+
+        <style>
+            #textarea-element-c {
+                font-family: Verdana, Geneva, sans-serif !important;
+                min-height: 30px;
+                font-size: inherit;
+                color: inherit;
+                padding: 5px 10px 5px 10px;
+                vertical-align: middle;
+                background: #fff;
+                height: auto;
+                word-wrap: initial;
+                display: inline-block;
+                max-width: 100%;
+                width: 100%;
+                line-height: 1.5;
+                transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+                border-radius: 0 !important;
+                font: inherit;
+                font-size: inherit;
+                line-height: inherit;
+                font-family: inherit;
+                margin: 0;
+                overflow: auto;
+                box-sizing: border-box;
+                cursor: default;
+            }
+        </style>
     </head>
     <body>
         <input id="input-element-a" style="margin-top: 25px; margin-left: 20px; width: 600px; font-size: 24px" autocomplete="off" value="" />
@@ -27,8 +55,12 @@
         <br />
         <textarea id="textarea-element-b" style="font-size: inherit; color: inherit; padding: 5px 10px 5px 10px; vertical-align: middle" rows="4"></textarea>
         <br />
-        <textarea id="textarea-element-c" rows="4"></textarea>
+        <!-- <textarea id="textarea-element-c" rows="4"></textarea> -->
 
-        <script src="./main.js"></script>
+        <div style="width: 500px">
+            <textarea id="textarea-element-c" rows="4">
+asfdh adf asdfksdf klasdfksmf scklasnvnadsclsd nvjasn vasncv lasnvojadvacdsv j vlks jlfxlkcv jvl  sajv lkasm vjasvakscv jasd {{name}} vasnv {{name}} aks vmasc vkasd jwof qwljfnlaksmvjascv kl asnvia {{name}}k;sf lkasnf lknslkfn lasfnasdf kamf {{phone}}{{name}}sda adf asdf asdf {{name}}</textarea
+            >
+        </div>
     </body>
 </html>

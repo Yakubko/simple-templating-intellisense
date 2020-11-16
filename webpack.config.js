@@ -2,27 +2,75 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const { merge } = require('webpack-merge');
 
 const env = process.env.NODE_ENV;
 
-module.exports = {
-    mode: env === 'production' ? 'production' : 'development',
-    devtool: env === 'production' ? 'source-map' : 'inline-source-map',
-
-    entry: env === 'production' ? './src/index.ts' : './public/main.ts',
+const common = {
     resolve: {
         extensions: ['.ts', '.js', '.css'],
     },
 
     output: {
         path: path.resolve(__dirname, 'lib'),
-        filename: env === 'production' ? 'autocomplete.min.js' : '[name].js',
         libraryTarget: 'window',
         libraryExport: 'default',
-        library: 'Autocomplete',
+        library: 'STIntellisense',
         iife: true,
     },
-    plugins: [new MiniCssExtractPlugin({ filename: 'autocomplete.min.css' })],
+};
+
+const development = merge(common, {
+    mode: 'development',
+    devtool: 'inline-source-map',
+
+    entry: './public/main.ts',
+
+    output: {
+        filename: '[name].js',
+    },
+
+    plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, './public/index.html'),
+        }),
+    ],
+
+    module: {
+        rules: [
+            {
+                test: /\.ts$/,
+                exclude: /node_modules/,
+                loader: 'ts-loader',
+            },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
+            },
+        ],
+    },
+    optimization: {
+        minimize: false,
+    },
+    devServer: {
+        contentBase: path.resolve(__dirname, 'public'),
+        hot: true,
+    },
+});
+
+const production = merge(common, {
+    mode: 'production',
+    devtool: 'source-map',
+
+    entry: './src/index.ts',
+
+    output: {
+        filename: 'st-intellisense.min.js',
+    },
+    plugins: [new MiniCssExtractPlugin({ filename: 'st-intellisense.min.css' })],
     module: {
         rules: [
             {
@@ -32,16 +80,15 @@ module.exports = {
             },
             {
                 test: /\.css$/i,
-                use: [env === 'production' ? MiniCssExtractPlugin.loader : 'style-loader', 'css-loader'],
+                use: [MiniCssExtractPlugin.loader, 'css-loader'],
             },
         ],
     },
+
     optimization: {
         minimize: true,
         minimizer: [`...`, new CssMinimizerPlugin()],
     },
-    devServer: {
-        contentBase: path.resolve(__dirname, 'public'),
-        hot: true,
-    },
-};
+});
+
+module.exports = env === 'production' ? production : development;

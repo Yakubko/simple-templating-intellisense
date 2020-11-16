@@ -1,89 +1,23 @@
-const user = {
-    name: {},
-    title: {},
-    alias: {},
-    role: {},
-    profile: {},
-    nps_score: {},
-    description: {},
-    call_steering_description: {},
-    password: {},
-    extension: {},
-    acl: {},
-    clid: {},
-    static: {},
-    allowRecordingInterruption: {},
-    recordAtCallStart: {},
-    algo: {},
-    email: {},
-    emailAuth: {},
-    icon: {},
-    emoji: {},
-    options: {},
-    backoffice_user: {},
-    deactivated: {},
-    deleted: {},
-};
+const dataStructure = (function () {
+    const user = {},
+        article = {};
 
-const account = {
-    name: {},
-    title: {},
-    sla: {},
-    user: user,
-    description: {},
-    created: {},
-    edited: {},
-    customFields: {},
-};
-const contact = {
-    name: {},
-    title: {},
-    firstname: {},
-    lastname: {},
-    account: account,
-    user: user,
-    description: {},
-    nps_score: {},
-    created: {},
-    edited: {},
-    duplicateContacts: {},
-    notDuplicateContacts: {},
-    customFields: {},
-};
+    Object.assign(user, {
+        name: { title: 'Name', description: 'Unique name', nestedData: null, priority: 1 },
+        title: { title: 'Title', description: 'Display name', nestedData: null, priority: 2 },
+        bb: { title: 'bb: Priority: 4', description: 'Display name', nestedData: null, priority: 4 },
+        aaa: { title: 'aaa: Priority: 4', description: 'Display name', nestedData: null, priority: 4 },
+        cc: { title: 'c: Priority: empty', description: 'Display name', nestedData: null },
+        aa: { title: 'aa: Priority: empty', description: 'Display name', nestedData: null },
+    });
 
-export const list = {
-    activity: {
-        name: {},
-        ticket: {},
-        title: {},
-        important: {},
-        action: {},
-        type: {},
-        item: {},
-        queue: {},
-        user: user,
-        contact: contact,
-        survey: {},
-        record: {},
-        priority: {},
-        options: {},
-        description: {},
-        time: {},
-        time_wait: {},
-        time_open: {},
-        time_close: {},
-        baw: {},
-        aaw: {},
-        duration: {},
-        ringing_time: {},
-        created_by: user,
-        statuses: {},
-    },
-    user: user,
-    interaction: {
-        contact: contact,
-        title: {},
-        phone: {},
-        email: {},
-    },
-};
+    Object.assign(article, {
+        name: { title: 'Name', description: 'Unique name', nestedData: null },
+        title: { title: 'Title', description: 'Article title', nestedData: null },
+        user: { title: 'User', description: null, nestedData: user },
+    });
+
+    return { user, article };
+})();
+
+export default dataStructure;

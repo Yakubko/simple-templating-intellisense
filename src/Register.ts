@@ -1,18 +1,20 @@
-import List, { ListData } from './List';
 import EventsInterface from './EventsInterface';
 
-import { AllowedElements } from './types';
+import { AllowedElements, IntellisenseData } from './types';
 
 export default class Register {
     private name: string;
+    private _data: IntellisenseData;
     private elements: EventsInterface[] = [];
 
     constructor(name: string) {
         this.name = name;
     }
 
-    data(data?: ListData): ListData {
-        return List.data(this.name, data);
+    data(data?: IntellisenseData): IntellisenseData {
+        if (data) this._data = data;
+
+        return this._data;
     }
 
     add(element: AllowedElements): void {
@@ -34,5 +36,13 @@ export default class Register {
 
             return true;
         });
+    }
+
+    clean(): void {
+        this.elements.forEach((elementInterface) => {
+            this.remove(elementInterface.getElement());
+        });
+
+        this.elements = [];
     }
 }

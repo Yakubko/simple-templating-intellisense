@@ -1,15 +1,27 @@
 import Register from './Register';
 
-export default class Autocomplete {
-    private static groups: Record<string, Register> = {};
+export default class STIntellisense {
+    private static registers: Record<string, Register> = {};
 
     public static getRegister(name = 'default'): Register {
-        let group = Autocomplete.groups[name];
-        if (group === undefined) {
-            group = new Register(name);
-            Autocomplete.groups[name] = group;
+        let register = STIntellisense.registers[name];
+        if (register === undefined) {
+            register = new Register(name);
+            STIntellisense.registers[name] = register;
         }
 
-        return group;
+        return register;
+    }
+
+    public removeRegister(name = 'default'): void {
+        STIntellisense.registers[name]?.clean();
+    }
+
+    public static clean(): void {
+        for (const name in this.registers) {
+            STIntellisense.registers[name].clean();
+        }
+
+        STIntellisense.registers = {};
     }
 }

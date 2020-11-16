@@ -1,5 +1,5 @@
 import Autocomplete from '../src/index';
-import { list } from './data';
+import dataStructure from './data';
 
 const ACRegister = Autocomplete.getRegister();
 const inputElA = document.getElementById('input-element-a') as HTMLInputElement;
@@ -10,7 +10,8 @@ const textareaElA = document.getElementById('textarea-element-a') as HTMLTextAre
 const textareaElB = document.getElementById('textarea-element-b') as HTMLTextAreaElement;
 const textareaElC = document.getElementById('textarea-element-c') as HTMLTextAreaElement;
 
-ACRegister.data(list);
+ACRegister.data(dataStructure.article);
+
 ACRegister.add(inputElA);
 ACRegister.add(inputElB);
 ACRegister.add(inputElC);

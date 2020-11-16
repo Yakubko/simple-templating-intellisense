@@ -2,6 +2,8 @@
     "compilerOptions": {
         "outDir": "dist",
         "lib": ["es2016", "dom"],
+        "noImplicitAny": true,
+        "suppressImplicitAnyIndexErrors": true,
         "sourceMap": true,
         "module": "CommonJS",
         "target": "es5"
