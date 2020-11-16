@@ -1,5 +1,5 @@
 {
-    "name": "autocomplete",
+    "name": "st-intellisense",
     "version": "1.0.0",
     "description": "Simple templating intellisense",
     "author": "Jakub Miskech <yakubmiskech@gmail.com>",
@@ -10,10 +10,10 @@
     ],
     "scripts": {
         "start": "NODE_ENV=development webpack serve",
-        "build": "npm run build:node && npm run build:iife",
+        "build": "npm run build:node && npm run build:browser",
         "build:node": "rimraf ./dist && tsc",
-        "build:iife": "rimraf ./lib && NODE_ENV=production webpack",
-        "test": "jest",
+        "build:browser": "rimraf ./lib && NODE_ENV=production webpack",
+        "test": "jest --config ./config/jest.config.js",
         "test:staged": "CI=true npm run test -- --bail --findRelatedTests --forceExit",
         "prettier": "prettier '*/**/*.+(ts|json|yml|yaml|css|md)' --write",
         "lint": "eslint 'src/**/*.ts' --fix"
@@ -33,59 +33,11 @@
         ]
     },
     "eslintConfig": {
-        "parser": "@typescript-eslint/parser",
-        "parserOptions": {
-            "ecmaVersion": 2020,
-            "sourceType": "module"
-        },
-        "extends": [
-            "plugin:@typescript-eslint/recommended",
-            "prettier/@typescript-eslint",
-            "plugin:prettier/recommended"
-        ],
-        "rules": {}
+        "extends": "./config/.eslintrc"
     },
-    "prettier": {
-        "semi": true,
-        "trailingComma": "all",
-        "singleQuote": true,
-        "printWidth": 220,
-        "tabWidth": 4
-    },
+    "prettier": "./config/.prettierrc.js",
     "babel": {
-        "presets": [
-            "@babel/preset-env",
-            "@babel/preset-typescript"
-        ],
-        "plugins": [
-            [
-                "@babel/plugin-proposal-class-properties",
-                {
-                    "loose": true
-                }
-            ],
-            [
-                "transform-remove-console",
-                {
-                    "exclude": [
-                        "error",
-                        "warn"
-                    ]
-                }
-            ],
-            "@babel/proposal-object-rest-spread"
-        ]
-    },
-    "jest": {
-        "preset": "ts-jest",
-        "testEnvironment": "jsdom",
-        "setupFilesAfterEnv": [
-            "./test/__mocks__/jest.setup.js"
-        ],
-        "moduleNameMapper": {
-            "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/__mocks__/fileMock.js",
-            "\\.(css|less)$": "<rootDir>/test/__mocks__/styleMock.js"
-        }
+        "extends": "./config/.babelrc"
     },
     "dependencies": {},
     "devDependencies": {
