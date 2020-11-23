@@ -1,8 +1,6 @@
 jobs:
     test:
-        executor:
-            name: node/default
-            tag: '13'
+        executor: node/default
         steps:
             - checkout
             - node/install-packages:
