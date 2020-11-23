@@ -151,7 +151,7 @@ class Component {
     }
 
     private getCaretPosition(): { left: number; top: number } {
-        const { left: boundingLeft, top: boundingTop } = this.element.getBoundingClientRect();
+        const { left: boundingLeft, top: boundingTop, right: boundingRight } = this.element.getBoundingClientRect();
         const computedStyle = window.getComputedStyle(this.element);
 
         const { value, selectionStart } = this.element;
@@ -188,10 +188,14 @@ class Component {
                 break;
         }
 
-        return {
-            left: boundingLeft + Math.round(fontCanvasCtx.measureText(text).width) - this.element.scrollLeft + parseInt(paddingLeft),
-            top: boundingTop + top + parseInt(paddingTop),
+        const ret = {
+            left: Math.floor(boundingLeft + Math.round(fontCanvasCtx.measureText(text).width) - this.element.scrollLeft + parseInt(paddingLeft)),
+            top: Math.floor(boundingTop + top + parseInt(paddingTop)),
         };
+
+        if (ret.left > boundingRight) ret.left = Math.max(boundingLeft, boundingRight - 300);
+
+        return ret;
     }
 }
 

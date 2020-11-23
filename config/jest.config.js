@@ -1,6 +1,7 @@
 module.exports = {
     rootDir: '../',
     preset: 'ts-jest',
+    collectCoverageFrom: ['<rootDir>/src/**/*.{ts,js}'],
     testEnvironment: 'jsdom',
     setupFilesAfterEnv: ['<rootDir>/test/__mocks__/jest.setup.js'],
     moduleNameMapper: {

@@ -1,26 +1,22 @@
-import Autocomplete from '../src/index';
-import dataStructure from './data';
+import STIntellisense from '../src/';
+import dataStructure from './source';
 
-const ACRegister = Autocomplete.getRegister();
-const inputElA = document.getElementById('input-element-a') as HTMLInputElement;
-const inputElB = document.getElementById('input-element-b') as HTMLInputElement;
-const inputElC = document.getElementById('input-element-c') as HTMLInputElement;
+const STIRegister = STIntellisense.getRegister();
+const inputElA = document.getElementById('colFormLabelSm') as HTMLInputElement;
+const inputElB = document.getElementById('colFormLabel') as HTMLInputElement;
 
-const textareaElA = document.getElementById('textarea-element-a') as HTMLTextAreaElement;
-const textareaElB = document.getElementById('textarea-element-b') as HTMLTextAreaElement;
-const textareaElC = document.getElementById('textarea-element-c') as HTMLTextAreaElement;
+const textareaElA = document.getElementById('colFormLabelSmTextarea') as HTMLTextAreaElement;
+const textareaElB = document.getElementById('colFormLabelTextarea') as HTMLTextAreaElement;
 
-ACRegister.data(dataStructure.article);
+STIRegister.data(dataStructure.article);
 
-ACRegister.add(inputElA);
-ACRegister.add(inputElB);
-ACRegister.add(inputElC);
+STIRegister.add(inputElA);
+STIRegister.add(inputElB);
 
-ACRegister.add(textareaElA);
-ACRegister.add(textareaElB);
-ACRegister.add(textareaElC);
+STIRegister.add(textareaElA);
+STIRegister.add(textareaElB);
 
-// ACRegister.add(inputElC);
+// STIRegister.add(inputElC);
 // setTimeout(() => {
-//     ACRegister.remove(inputElC);
+//     STIRegister.remove(inputElC);
 // }, 2000);

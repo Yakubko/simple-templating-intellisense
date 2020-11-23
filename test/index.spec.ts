@@ -1,4 +1,4 @@
-import STIntellisense from '../src/index';
+import STIntellisense from '../src';
 
 describe('STIntellisense', () => {
     it('list', () => {
