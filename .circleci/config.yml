@@ -10,10 +10,8 @@ jobs:
             - run:
                   command: yarn run test
                   name: Run YARN tests
-            - store_artifacts:
-                  path: coverage
             - codecov/upload:
-                  file: coverage
+                  file: coverage/coverage-final.json
 orbs:
     node: circleci/node@4.1.0
     codecov: codecov/codecov@1.0.2
