@@ -8,11 +8,6 @@ jobs:
             - node/install-packages:
                   pkg-manager: yarn
             - run:
-                  command: yarn run test
-                  name: Run YARN tests
-            - codecov/upload:
-                  file: coverage/coverage-final.json
-            - run:
                   name: Install JUnit coverage reporter
                   command: yarn add --dev jest-junit
             - run:
@@ -20,6 +15,8 @@ jobs:
                   command: yarn run test --ci --runInBand --reporters=default --reporters=jest-junit
                   environment:
                       JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
+            - codecov/upload:
+                  file: coverage/coverage-final.json
             - store_test_results:
                   path: ./reports/junit/
             - store_artifacts:
