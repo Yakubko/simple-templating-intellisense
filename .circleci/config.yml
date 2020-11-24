@@ -10,6 +10,8 @@ jobs:
             - run:
                   command: yarn run test
                   name: Run YARN tests
+            - store_artifacts:
+                  path: coverage
 orbs:
     node: circleci/node@4.1.0
 version: 2.1
