@@ -10,10 +10,20 @@ jobs:
             - run:
                   command: yarn run test
                   name: Run YARN tests
-            - store_test_results:
-                  path: coverage/junit.xml
             - codecov/upload:
                   file: coverage/coverage-final.json
+            - run:
+                  name: Install JUnit coverage reporter
+                  command: yarn add --dev jest-junit
+            - run:
+                  name: Run tests with JUnit as reporter
+                  command: jest --ci --runInBand --reporters=default --reporters=jest-junit
+                  environment:
+                      JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
+            - store_test_results:
+                  path: ./reports/junit/
+            - store_artifacts:
+                  path: ./reports/junit
 orbs:
     node: circleci/node@4.1.0
     codecov: codecov/codecov@1.0.2
