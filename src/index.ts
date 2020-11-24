@@ -13,8 +13,11 @@ export default class STIntellisense {
         return register;
     }
 
-    public removeRegister(name = 'default'): void {
-        STIntellisense.registers[name]?.clean();
+    public static removeRegister(name = 'default'): void {
+        if (STIntellisense.registers[name]) {
+            STIntellisense.registers[name].clean();
+            delete STIntellisense.registers[name];
+        }
     }
 
     public static clean(): void {
