@@ -10,6 +10,8 @@ jobs:
             - run:
                   command: yarn run test
                   name: Run YARN tests
+            - store_test_results:
+                  path: coverage/test-result.json
             - codecov/upload:
                   file: coverage/coverage-final.json
 orbs:
