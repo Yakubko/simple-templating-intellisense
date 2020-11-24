@@ -1,2 +1,5 @@
 # simple-templating-intellisense
-Itelligent code completion for templating-string library
+
+[![CircleCI](https://circleci.com/gh/Yakubko/simple-templating-intellisense.svg?style=svg)](LINK)
+
+Intelligent code completion for templating-string library
