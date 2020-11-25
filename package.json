@@ -13,8 +13,9 @@
         "build": "npm run build:node && npm run build:browser",
         "build:node": "rimraf ./dist && tsc",
         "build:browser": "rimraf ./lib && NODE_ENV=production webpack",
-        "test": "jest --config ./config/jest.config.js --coverage",
-        "test:staged": "CI=true npm run test -- --bail --findRelatedTests --forceExit",
+        "test": "jest --config ./config/jest.config.js",
+        "test:watch": "npm run test -- --watch",
+        "test:staged": "CI=true npm run test -- --bail --findRelatedTests",
         "prettier": "prettier '*/**/*.+(ts|json|yml|yaml|css|md)' --write",
         "lint": "eslint 'src/**/*.ts' --fix"
     },

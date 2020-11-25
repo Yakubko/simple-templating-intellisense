@@ -12,7 +12,7 @@ jobs:
                   command: yarn add --dev jest-junit
             - run:
                   name: Run tests with JUnit as reporter
-                  command: yarn run test --ci --runInBand --reporters=default --reporters=jest-junit
+                  command: yarn run test --ci --coverage --runInBand --reporters=default --reporters=jest-junit
                   environment:
                       JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
             - codecov/upload:

@@ -5,7 +5,7 @@ import { AllowedElements, IntellisenseData } from './types';
 export default class Register {
     private name: string;
     private _data: IntellisenseData;
-    private elements: EventsInterface[] = [];
+    private _elements: EventsInterface[] = [];
 
     constructor(name: string) {
         this.name = name;
@@ -17,18 +17,22 @@ export default class Register {
         return this._data;
     }
 
+    elements(): EventsInterface[] {
+        return this._elements;
+    }
+
     add(element: AllowedElements): void {
         if (
-            !this.elements.some((el) => {
+            !this._elements.some((el) => {
                 return el.getElement().isSameNode(element);
             })
         ) {
-            this.elements.push(new EventsInterface(element, this.name));
+            this._elements.push(new EventsInterface(element, this.name));
         }
     }
 
     remove(element: AllowedElements): void {
-        this.elements = this.elements.filter((el) => {
+        this._elements = this._elements.filter((el) => {
             if (el.getElement().isSameNode(element)) {
                 el.unbind();
                 return false;
@@ -39,10 +43,11 @@ export default class Register {
     }
 
     clean(): void {
-        this.elements.forEach((elementInterface) => {
+        this._elements.forEach((elementInterface) => {
             this.remove(elementInterface.getElement());
         });
 
-        this.elements = [];
+        this._data = {};
+        this._elements = [];
     }
 }
