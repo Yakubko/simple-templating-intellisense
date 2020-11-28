@@ -4,7 +4,7 @@ import { AllowedElements, IntellisenseData } from './types';
 
 export default class Register {
     private name: string;
-    private _data: IntellisenseData;
+    private _data: IntellisenseData = {};
     private _elements: EventsInterface[] = [];
 
     constructor(name: string) {

@@ -23,6 +23,10 @@ export default class EventInterface {
         return this.element;
     }
 
+    getScrollableElements(): (HTMLElement | Window)[] {
+        return this.scrollableElements;
+    }
+
     handleEvent(event: Event): void {
         switch (event.type) {
             case 'focus':
@@ -40,12 +44,12 @@ export default class EventInterface {
                 List.hide();
                 break;
 
-            case 'keyup':
-                this.keyup(event as KeyboardEvent);
-                break;
-
             case 'keydown':
                 this.keydown(event as KeyboardEvent);
+                break;
+
+            case 'keyup':
+                this.keyup(event as KeyboardEvent);
                 break;
         }
     }
@@ -53,8 +57,8 @@ export default class EventInterface {
     private focus(): void {
         this.element.addEventListener('blur', this, false);
         this.element.addEventListener('click', this, false);
-        this.element.addEventListener('keyup', this, false);
         this.element.addEventListener('keydown', this, false);
+        this.element.addEventListener('keyup', this, false);
 
         if (this.element.nodeName === 'TEXTAREA') {
             this.element.addEventListener('scroll', this, false);
@@ -74,8 +78,8 @@ export default class EventInterface {
     private blur() {
         this.element.removeEventListener('blur', this, false);
         this.element.removeEventListener('click', this, false);
-        this.element.removeEventListener('keyup', this, false);
         this.element.removeEventListener('keydown', this, false);
+        this.element.removeEventListener('keyup', this, false);
 
         if (this.element.nodeName === 'TEXTAREA') {
             this.element.removeEventListener('scroll', this, false);
@@ -99,31 +103,6 @@ export default class EventInterface {
         }
     }
 
-    private keyup(event: KeyboardEvent): void {
-        if (this.state.ignoreOneTimeKeyUpEvent) {
-            this.state.ignoreOneTimeKeyUpEvent = false;
-            return;
-        }
-
-        if (event.key === 'Escape') {
-            List.hide();
-            return;
-        }
-
-        const { value, selectionStart: caretPosition } = this.element;
-        if (event.key === '{' && value.substr(caretPosition - 2, 2) === '{{') {
-            this.state.ignoreOneTimeKeyUpEvent = true;
-            this.addValueString('}}', true);
-        }
-
-        const bracketActiveWord = this.getBracketActiveWord();
-        if (bracketActiveWord !== null) {
-            List.show(bracketActiveWord);
-        } else {
-            List.hide();
-        }
-    }
-
     private keydown(event: KeyboardEvent): void {
         if (List.isVisible() && ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) {
             this.state.ignoreOneTimeKeyUpEvent = true;
@@ -142,6 +121,30 @@ export default class EventInterface {
             if (['ArrowUp', 'ArrowDown'].includes(event.key)) {
                 List.select(event.key === 'ArrowUp' ? 'up' : 'down');
             }
+        }
+    }
+
+    private keyup(event: KeyboardEvent): void {
+        if (this.state.ignoreOneTimeKeyUpEvent) {
+            this.state.ignoreOneTimeKeyUpEvent = false;
+            return;
+        }
+
+        if (event.key === 'Escape') {
+            List.hide();
+            return;
+        }
+
+        const { value, selectionStart: caretPosition } = this.element;
+        if (event.key === '{' && value.substr(caretPosition - 2, 2) === '{{') {
+            this.addValueString('}}', true);
+        }
+
+        const bracketActiveWord = this.getBracketActiveWord();
+        if (bracketActiveWord !== null) {
+            List.show(bracketActiveWord);
+        } else {
+            List.hide();
         }
     }
 

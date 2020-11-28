@@ -1,3 +1,3 @@
-HTMLCanvasElement.prototype.getContext = () => {
-    // return whatever getContext has to return
+window.HTMLElement.prototype.scrollIntoView = () => {
+    // return
 };
