@@ -23,10 +23,6 @@ export default class EventInterface {
         return this.element;
     }
 
-    getScrollableElements(): (HTMLElement | Window)[] {
-        return this.scrollableElements;
-    }
-
     handleEvent(event: Event): void {
         switch (event.type) {
             case 'focus':

@@ -3,8 +3,6 @@ import EventsInterface from '../src/EventsInterface';
 import { IntellisenseData } from '../src/types';
 
 describe('STIntellisense Register', () => {
-    // https://ilikekillnerds.com/2020/02/testing-event-listeners-in-jest-without-using-a-library/
-
     it('Create register', () => {
         const register = new Register('default');
 

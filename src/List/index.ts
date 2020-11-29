@@ -39,13 +39,13 @@ class List {
         Component.renderList([]);
     }
 
-    select(direction?: 'up' | 'down'): IntellisenseList | null {
+    select(direction?: 'up' | 'down'): IntellisenseList {
         if (direction && this.visibleData.length > 1) {
             this.selectedIndex = _mod(this.selectedIndex + (direction === 'down' ? 1 : -1), this.visibleData.length);
             Component.select(this.selectedIndex, this.visibleData[this.selectedIndex]);
         }
 
-        return this.visibleData[this.selectedIndex] || null;
+        return this.visibleData[this.selectedIndex];
     }
 
     isVisible(): boolean {
@@ -62,16 +62,14 @@ class List {
                     return fnGetScopeLevel(_path, _data[key].nestedData);
                 }
                 return [];
-            } else if (_path.length === 1) {
-                const output: IntellisenseList[] = [];
-                for (const [key, value] of Object.entries(_data)) {
-                    output.push({ name: key, autocomplete: key.substr(_path[0].length), object: value });
-                }
-
-                return output;
             }
 
-            return [];
+            const output: IntellisenseList[] = [];
+            for (const [key, value] of Object.entries(_data)) {
+                output.push({ name: key, autocomplete: key.substr(_path[0].length), object: value });
+            }
+
+            return output;
         };
 
         const pathList = path.split('.');

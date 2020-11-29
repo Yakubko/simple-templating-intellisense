@@ -104,7 +104,7 @@ describe('STIntellisense EventsInterface', () => {
         let ei = new EventsInterface(input, 'default');
         events.focus.handleEvent(eventFocus);
 
-        expect(ei.getScrollableElements()).toHaveLength(1);
+        expect(ei['scrollableElements']).toHaveLength(1);
 
         const inputInScrollableContent = document.createElement('input');
         mockEventListener(inputInScrollableContent);
@@ -119,7 +119,7 @@ describe('STIntellisense EventsInterface', () => {
 
         events.focus.handleEvent(eventFocus);
 
-        expect(ei.getScrollableElements()).toHaveLength(2);
+        expect(ei['scrollableElements']).toHaveLength(2);
 
         inputInScrollableContent.remove();
     });
@@ -133,7 +133,7 @@ describe('STIntellisense EventsInterface', () => {
 
         events.focus.handleEvent(eventFocus);
 
-        expect(ei.getScrollableElements()).toHaveLength(0);
+        expect(ei['scrollableElements']).toHaveLength(0);
 
         inputInScrollableContent.remove();
     });

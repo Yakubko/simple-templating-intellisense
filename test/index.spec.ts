@@ -2,8 +2,6 @@ import STIntellisense from '../src';
 import Register from '../src/Register';
 
 describe('STIntellisense', () => {
-    // https://ilikekillnerds.com/2020/02/testing-event-listeners-in-jest-without-using-a-library/
-
     it('Get register', () => {
         const register = STIntellisense.getRegister();
 

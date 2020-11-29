@@ -16,9 +16,9 @@ type ListDom = {
 };
 
 class Component {
-    protected dom: ListDom = { mainElement: null, ulElement: null, detailElement: null };
-    protected element: AllowedElements | null;
-    protected measurementsHelpers: MeasurementsHelpers;
+    private dom: ListDom = { mainElement: null, ulElement: null, detailElement: null };
+    private element: AllowedElements | null;
+    private measurementsHelpers: MeasurementsHelpers;
 
     constructor() {
         this.createDom();
@@ -37,7 +37,7 @@ class Component {
         this.dom.mainElement.style.zIndex = zIndex ? (zIndex + 1).toString() : 'auto';
 
         const { fontSize, fontFamily } = computedStyle;
-        const fontSpec = `${fontSize} ${fontFamily || 'sans-serif'}`;
+        const fontSpec = `${fontSize || '10px'} ${fontFamily || 'sans-serif'}`;
         if (fontCanvasCtx.font !== fontSpec) fontCanvasCtx.font = fontSpec;
 
         if (this.element.nodeName === 'TEXTAREA') {
@@ -73,23 +73,25 @@ class Component {
     }
 
     select(index: number, detail: IntellisenseList): void {
+        if (this.element === null) return;
+
         this.dom.detailElement.innerHTML = `${detail.object.title || detail.name}<br/><hr/>${detail.object.description || ''}`;
 
         if (this.dom.ulElement.dataset.stiSelected && this.dom.ulElement.children[this.dom.ulElement.dataset.stiSelected]) {
             this.dom.ulElement.children[this.dom.ulElement.dataset.stiSelected].classList.remove('ui-state-focus');
         }
 
-        if (this.dom.ulElement.children[index]) {
-            this.dom.ulElement.dataset.stiSelected = index + '';
-            this.dom.ulElement.children[index].classList.add('ui-state-focus');
-            this.dom.ulElement.children[index].scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-            });
-        }
+        this.dom.ulElement.dataset.stiSelected = index + '';
+        this.dom.ulElement.children[index].classList.add('ui-state-focus');
+        this.dom.ulElement.children[index].scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+        });
     }
 
     renderList(data: IntellisenseList[]): void {
+        if (this.element === null) return;
+
         delete this.dom.ulElement.dataset.stiSelected;
 
         if (data.length > 0) {
